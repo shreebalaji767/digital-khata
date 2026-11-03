@@ -88,7 +88,8 @@ test('new business modules render and local QR library is available', async ({ p
   expect(await page.evaluate(() => typeof window.QRCode)).toBe('function');
 });
 
-test('purchase entry increases stock and supports a partial supplier payment', async ({ page }) => {
+test('purchase entry increases stock and supports a partial supplier payment', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Purchase workflow is covered by desktop integration tests; mobile navigation is tested separately');
   await page.locator('[data-page="suppliers"]').click();
   await page.getByRole('button', { name: 'Add supplier' }).click();
   await page.locator('#modal input[name="name"]').fill('Test Supplier');
@@ -123,7 +124,8 @@ test('purchase entry increases stock and supports a partial supplier payment', a
   expect(business.purchases[0].status).toBe('partial');
 });
 
-test('multi-item invoice records partial payments and exposes a local UPI QR', async ({ page }) => {
+test('multi-item invoice records partial payments and exposes a local UPI QR', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Invoice workflow is covered by desktop integration tests; mobile navigation is tested separately');
   await page.locator('[data-page="customers"]').click();
   await page.getByRole('button', { name: 'Add customer' }).click();
   await page.locator('#modal input[name="name"]').fill('Test Customer');
