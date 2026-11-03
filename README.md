@@ -1,6 +1,6 @@
 # Digital Khata
 
-Static, offline-first business ledger and management app for GitHub Pages.
+Static, offline-first business and personal finance management app for GitHub Pages.
 
 ## Features
 - Multiple independent business profiles in one browser
@@ -19,6 +19,13 @@ Static, offline-first business ledger and management app for GitHub Pages.
 - CSV export, storage usage indicator and offline service-worker cache
 - Light/dark theme, English/Hindi navigation labels and keyboard shortcuts
 - Responsive layout, visible keyboard focus and installable PWA
+
+- Separate Personal & Family workspace with income, expenses, lending, borrowing and repayments
+- Personal cash/bank/UPI accounts and account balance tracking
+- Monthly category budgets, savings goals and spending analytics
+- Household bill register with due dates, frequencies and paid/due status
+- Personal task planner and document/insurance/warranty/vehicle reference register
+- Separate personal-data export; personal records are included in full backups
 
 ## Keyboard shortcuts
 - Ctrl/Cmd + K: focus the current section's search field
