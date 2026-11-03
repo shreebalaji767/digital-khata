@@ -18,15 +18,15 @@ test('loads the dashboard without browser errors', async ({ page }) => {
 
 test('all workspace sections open', async ({ page, isMobile }) => {
   const sections = [
-    ['Khata Ledger', 'Khata Ledger'],
-    ['Customers', 'Customers'],
-    ['Suppliers', 'Suppliers'],
+    ['Khata Ledger', 'Add account'],
+    ['Customers', 'Add customer'],
+    ['Suppliers', 'Add supplier'],
     ['Payments', 'Payment history'],
     ['Invoices & Sales', 'Sales invoices'],
     ['Inventory', 'Inventory'],
     ['Expenses', 'Business expenses'],
-    ['Payment Reminders', 'Reminder list'],
-    ['Reports', 'Reports'],
+    ['Reminders', 'Reminder list'],
+    ['Reports', 'Udhaar recorded'],
     ['Settings & Backup', 'Business profile']
   ];
 
