@@ -189,6 +189,10 @@ test('personal finances, budgets, household bills and records stay separate from
   await expect(page.locator('#view')).toContainText('Monthly budgets');
 
   await page.getByRole('button', { name: 'Household', exact: true }).click();
+  await page.getByRole('button', { name: 'Add member' }).click();
+  await page.locator('#modal input[name="name"]').fill('Family Member');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Family Member');
   await page.getByRole('button', { name: 'Add household bill' }).click();
   await page.locator('#modal input[name="name"]').fill('Electricity');
   await page.locator('#modal input[name="amount"]').fill('1800');
@@ -216,6 +220,7 @@ test('personal finances, budgets, household bills and records stay separate from
   expect(stored.personal.transactions).toHaveLength(1);
   expect(stored.personal.budgets).toHaveLength(1);
   expect(stored.personal.bills).toHaveLength(1);
+  expect(stored.personal.members).toHaveLength(1);
   expect(stored.personal.tasks).toHaveLength(1);
   expect(stored.personal.documents).toHaveLength(1);
   expect(stored.businesses[0].data.customers).toHaveLength(0);
