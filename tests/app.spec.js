@@ -57,6 +57,7 @@ test('customer and ledger entries persist after reload', async ({ page, isMobile
   await expect(page.locator('#view')).toContainText('1,250');
 
   await page.reload();
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
   await expect(page.locator('#view')).toContainText('Persistence Test Customer');
   await page.locator('[data-page="ledger"]').click();
   await expect(page.locator('#view')).toContainText('Persistence Test Customer');
@@ -114,7 +115,7 @@ test('purchase entry increases stock and supports a partial supplier payment', a
 
   let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
   let business = stored.businesses[0].data;
-  expect(business.products[0].stock).toBe(12);
+  expect(business.products.find(product => product.sku === 'SKU-TEST-01').stock).toBe(12);
   expect(business.purchases).toHaveLength(1);
   await page.locator('[data-pay-purchase]').click();
   await page.locator('#modal input[name="amount"]').fill('100');
