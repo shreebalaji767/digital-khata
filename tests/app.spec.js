@@ -31,7 +31,8 @@ test('all workspace sections open', async ({ page, isMobile }) => {
     ['Expenses', 'Business expenses'],
     ['Reminders', 'Reminder list'],
     ['Reports', 'Profit & loss'],
-    ['Settings & Backup', 'Business profile']
+    ['Settings & Backup', 'Business profile'],
+    ['Personal & Family', 'Personal & family workspace']
   ];
 
   for (const [navName, expectedText] of sections) {
@@ -167,4 +168,54 @@ test('multi-item invoice records partial payments and exposes a local UPI QR', a
   expect(business.invoices[0].status).toBe('partial');
   await page.getByRole('button', { name: 'UPI QR' }).click();
   await expect(page.locator('#paymentQr canvas, #paymentQr img')).toBeVisible();
+});
+
+test('personal finances, budgets, household bills and records stay separate from business books', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="personal"]').click();
+  await expect(page.locator('#view')).toContainText('Personal & family workspace');
+  await page.getByRole('button', { name: 'Money', exact: true }).click();
+  await page.getByRole('button', { name: 'Add transaction' }).click();
+  await page.locator('#modal select[name="type"]').selectOption('income');
+  await page.locator('#modal input[name="amount"]').fill('35000');
+  await page.locator('#modal input[name="person"]').fill('Monthly salary');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('35,000');
+
+  await page.getByRole('button', { name: 'Budgets & savings' }).click();
+  await page.getByRole('button', { name: 'Budget', exact: true }).click();
+  await page.locator('#modal input[name="amount"]').fill('5000');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Monthly budgets');
+
+  await page.getByRole('button', { name: 'Household', exact: true }).click();
+  await page.getByRole('button', { name: 'Add household bill' }).click();
+  await page.locator('#modal input[name="name"]').fill('Electricity');
+  await page.locator('#modal input[name="amount"]').fill('1800');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Electricity');
+
+  await page.getByRole('button', { name: 'Tasks & reminders' }).click();
+  await page.getByRole('button', { name: 'Add task' }).click();
+  await page.locator('#modal input[name="name"]').fill('Pay electricity');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Pay electricity');
+
+  await page.getByRole('button', { name: 'Documents' }).click();
+  await page.getByRole('button', { name: 'Add record' }).click();
+  await page.locator('#modal input[name="name"]').fill('Vehicle insurance');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Vehicle insurance');
+
+  await page.reload();
+  await page.locator('[data-page="personal"]').click();
+  await page.getByRole('button', { name: 'Money', exact: true }).click();
+  await expect(page.locator('#view')).toContainText('Monthly salary');
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.personal.transactions).toHaveLength(1);
+  expect(stored.personal.budgets).toHaveLength(1);
+  expect(stored.personal.bills).toHaveLength(1);
+  expect(stored.personal.tasks).toHaveLength(1);
+  expect(stored.personal.documents).toHaveLength(1);
+  expect(stored.businesses[0].data.customers).toHaveLength(0);
 });
