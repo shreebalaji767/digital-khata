@@ -183,7 +183,7 @@ test('personal finances, budgets, household bills and records stay separate from
   await expect(page.locator('#view')).toContainText('35,000');
 
   await page.getByRole('button', { name: 'Budgets & savings' }).click();
-  await page.getByRole('button', { name: 'Budget', exact: true }).click();
+  await page.getByRole('button', { name: 'Budget' }).click();
   await page.locator('#modal input[name="amount"]').fill('5000');
   await page.locator('#saveModal').click();
   await expect(page.locator('#view')).toContainText('Monthly budgets');
