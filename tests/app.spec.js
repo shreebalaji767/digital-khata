@@ -208,6 +208,7 @@ test('personal finances, budgets, household bills and records stay separate from
   await expect(page.locator('#view')).toContainText('Vehicle insurance');
 
   await page.reload();
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
   await page.locator('[data-page="personal"]').click();
   await page.getByRole('button', { name: 'Money', exact: true }).click();
   await expect(page.locator('#view')).toContainText('Monthly salary');
