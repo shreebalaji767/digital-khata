@@ -87,3 +87,82 @@ test('new business modules render and local QR library is available', async ({ p
   }
   expect(await page.evaluate(() => typeof window.QRCode)).toBe('function');
 });
+
+test('purchase entry increases stock and supports a partial supplier payment', async ({ page }) => {
+  await page.locator('[data-page="suppliers"]').click();
+  await page.getByRole('button', { name: 'Add supplier' }).click();
+  await page.locator('#modal input[name="name"]').fill('Test Supplier');
+  await page.locator('#saveModal').click();
+
+  await page.locator('[data-page="inventory"]').click();
+  await page.getByRole('button', { name: 'Add product' }).click();
+  await page.locator('#modal input[name="name"]').fill('Test Product');
+  await page.locator('#modal input[name="sku"]').fill('SKU-TEST-01');
+  await page.locator('#modal input[name="cost"]').fill('100');
+  await page.locator('#modal input[name="price"]').fill('150');
+  await page.locator('#modal input[name="stock"]').fill('10');
+  await page.locator('#saveModal').click();
+
+  await page.locator('[data-page="purchases"]').click();
+  await page.getByRole('button', { name: 'Record purchase' }).click();
+  await page.locator('#modal select[name="supplierId"]').selectOption({ label: 'Test Supplier' });
+  await page.locator('#modal select[name="itemProduct"]').selectOption({ label: 'Test Product · SKU-TEST-01' });
+  await page.locator('#modal input[name="itemQty"]').fill('2');
+  await page.locator('#saveModal').click();
+
+  let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  let business = stored.businesses[0].data;
+  expect(business.products[0].stock).toBe(12);
+  expect(business.purchases).toHaveLength(1);
+  await page.locator('[data-pay-purchase]').click();
+  await page.locator('#modal input[name="amount"]').fill('100');
+  await page.locator('#saveModal').click();
+  stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  business = stored.businesses[0].data;
+  expect(business.purchases[0].paidAmount).toBe(100);
+  expect(business.purchases[0].status).toBe('partial');
+});
+
+test('multi-item invoice records partial payments and exposes a local UPI QR', async ({ page }) => {
+  await page.locator('[data-page="customers"]').click();
+  await page.getByRole('button', { name: 'Add customer' }).click();
+  await page.locator('#modal input[name="name"]').fill('Test Customer');
+  await page.locator('#saveModal').click();
+
+  await page.locator('[data-page="inventory"]').click();
+  await page.getByRole('button', { name: 'Add product' }).click();
+  await page.locator('#modal input[name="name"]').fill('Invoice Product');
+  await page.locator('#modal input[name="sku"]').fill('SKU-INVOICE-01');
+  await page.locator('#modal input[name="cost"]').fill('40');
+  await page.locator('#modal input[name="price"]').fill('100');
+  await page.locator('#modal input[name="stock"]').fill('10');
+  await page.locator('#saveModal').click();
+
+  await page.locator('[data-page="settings"]').click();
+  await page.locator('#profileForm input[name="upi"]').fill('merchant@upi');
+  await page.locator('#profileForm button[type="submit"]').click();
+
+  await page.locator('[data-page="invoices"]').click();
+  await page.getByRole('button', { name: 'Create invoice' }).click();
+  await page.locator('#modal select[name="customerId"]').selectOption({ label: 'Test Customer' });
+  await page.locator('#modal select[name="itemProduct"]').first().selectOption({ label: 'Invoice Product · SKU-INVOICE-01' });
+  await page.getByRole('button', { name: 'Add item' }).click();
+  await page.locator('#modal select[name="itemProduct"]').nth(1).selectOption({ label: 'Invoice Product · SKU-INVOICE-01' });
+  await page.locator('#modal input[name="itemQty"]').nth(1).fill('2');
+  page.on('popup', popup => popup.close());
+  await page.locator('#saveModal').click();
+
+  let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  let business = stored.businesses[0].data;
+  expect(business.invoices[0].items).toHaveLength(2);
+  expect(business.invoices[0].total).toBeGreaterThan(0);
+  await page.locator('[data-pay-invoice]').click();
+  await page.locator('#modal input[name="amount"]').fill('50');
+  await page.locator('#saveModal').click();
+  stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  business = stored.businesses[0].data;
+  expect(business.invoices[0].paidAmount).toBe(50);
+  expect(business.invoices[0].status).toBe('partial');
+  await page.getByRole('button', { name: 'UPI QR' }).click();
+  await expect(page.locator('#paymentQr canvas, #paymentQr img')).toBeVisible();
+});
