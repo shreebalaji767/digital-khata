@@ -50,7 +50,7 @@ test('customer and ledger entries persist after reload', async ({ page, isMobile
   await expect(page.locator('#view')).toContainText('Persistence Test Customer');
 
   await page.getByRole('button', { name: 'Ledger', exact: true }).click();
-  await page.getByRole('button', { name: 'Add entry' }).click();
+  await page.locator('#ledgerAdd').click();
   await page.locator('#modal input[name="amount"]').fill('1250');
   await page.locator('#saveModal').click();
   await expect(page.locator('#view')).toContainText('1,250');
