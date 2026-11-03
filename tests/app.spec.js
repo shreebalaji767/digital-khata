@@ -24,9 +24,13 @@ test('all workspace sections open', async ({ page, isMobile }) => {
     ['Payments', 'Payment history'],
     ['Invoices & Sales', 'Sales invoices'],
     ['Inventory', 'Inventory'],
+    ['Purchases', 'Purchase invoices'],
+    ['Cashbook', 'Cashbook'],
+    ['Returns', 'Sales and purchase returns'],
+    ['Stock History', 'Stock movement history'],
     ['Expenses', 'Business expenses'],
     ['Reminders', 'Reminder list'],
-    ['Reports', 'Udhaar recorded'],
+    ['Reports', 'Profit & loss'],
     ['Settings & Backup', 'Business profile']
   ];
 
@@ -72,4 +76,14 @@ test('layout stays within common viewport widths', async ({ page }) => {
     expect(dimensions.document, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(dimensions.viewport + 1);
     await expect(page.locator('#view')).toBeVisible();
   }
+});
+
+test('new business modules render and local QR library is available', async ({ page, isMobile }) => {
+  const pages = ['purchases', 'cashbook', 'returns', 'stockHistory'];
+  for (const name of pages) {
+    if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+    await page.locator('[data-page="' + name + '"]').click();
+    await expect(page.locator('#view')).not.toBeEmpty();
+  }
+  expect(await page.evaluate(() => typeof window.QRCode)).toBe('function');
 });
