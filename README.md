@@ -38,6 +38,15 @@ Static, offline-first business and personal finance management app for GitHub Pa
 - Subscription register with billing cycle, renewal date and active/paused/cancelled status
 - Appointment and important-date planner, plus document/insurance/warranty/vehicle reference register
 - Separate personal-data export; all personal records are included in full JSON backups
+- Upgrade Centre with personal finance / net-worth dashboard and member-wise family dashboards
+- Shared family category budgets, shared savings goals, family calendar and assignable chores
+- Local documents vault with optional IndexedDB file attachments and renewal references
+- Local reminders for household bills, loan EMI, vehicle insurance / PUC / service and inventory expiry
+- Business performance dashboard with customer / supplier follow-up reminders, stock and expiry risk
+- Combined financial CSV report and browser Print → Save as PDF report centre
+- Automatic local backup snapshot after saves, periodic backup refresh, last-known-good recovery and three recent undo snapshots where storage permits
+- Business ledger recycle bin with restore; personal / family recycle bin with restore and permanent-delete controls
+- Stronger JSON import validation, transaction duplicate warnings and mobile-first upgrade centre controls
 - Distinct personal/family and business books; personal transactions do not alter business ledgers
 
 ## Keyboard shortcuts
@@ -52,9 +61,9 @@ Static, offline-first business and personal finance management app for GitHub Pa
 4. GitHub Pages will publish at https://shreebalaji767.github.io/digital-khata/
 
 ## Data and privacy
-All records are stored in this browser's localStorage. There is no server, database, account system or cross-device synchronization. Export JSON backups regularly. Data may be lost if browser storage is cleared. The app keeps a local recovery snapshot of the previous successful save where storage capacity permits.
+All records are stored in this browser's localStorage. There is no server, database, account system or cross-device synchronization. Export JSON backups regularly. Data may be lost if browser storage is cleared. The app keeps a latest automatic local snapshot, a last-known-good recovery copy and up to three recent undo snapshots where storage capacity permits. Business ledger deletions are recoverable from the recycle bin. IndexedDB document attachments remain on this browser and are not included in JSON backups; download them separately. Browser-local data is not encrypted or synced.
 
-UPI QR codes and UPI intent links are generated locally. The app cannot verify bank/UPI settlement or automatically send SMS/WhatsApp messages. WhatsApp sharing opens a pre-filled message for the user to send. Payment reconciliation is a manual bookkeeping flag, not a bank feed.
+UPI QR codes and UPI intent links are generated locally. The app cannot verify bank/UPI settlement or automatically send SMS/WhatsApp messages. Due alerts and optional browser notifications are calculated locally while the app is open; background notifications are not guaranteed. WhatsApp sharing opens a pre-filled message for the user to send. Payment reconciliation is a manual bookkeeping flag, not a bank feed.
 
 Financial, GST, profit and loss and ageing reports are estimates based on recorded entries. They are not a substitute for statutory accounting or tax advice; review figures with a qualified accountant before filing or issuing tax documents.
 
