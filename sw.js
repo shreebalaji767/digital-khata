@@ -1,5 +1,5 @@
-const CACHE='digital-khata-v9';
-const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./qrcode.js'];
+const CACHE='digital-khata-v10';
+const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./qrcode.js','./upgrades.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('digital-khata-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
