@@ -322,3 +322,54 @@ test('personal record deletion can be restored from the recycle bin', async ({ p
   await page.getByRole('button', { name: 'Restore' }).click();
   await expect(page.locator('#view')).toContainText('Insurance policy');
 });
+
+
+test('opens with a tracking query string without JavaScript errors', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/?utm_source=chatgpt.com');
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+  await expect(page.locator('#view')).toContainText('Quick actions');
+  expect(errors).toEqual([]);
+});
+
+test('family expense and settlement editors calculate member balances correctly', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="personal"]').click();
+  await page.getByRole('button', { name: 'Household', exact: true }).click();
+
+  for (const name of ['Asha', 'Ravi']) {
+    await page.getByRole('button', { name: 'Add member' }).click();
+    await page.locator('#modal input[name="name"]').fill(name);
+    await page.locator('#saveModal').click();
+  }
+
+  await page.getByRole('button', { name: 'Add shared expense' }).click();
+  await expect(page.locator('#modalTitle')).toHaveText('Shared household expense');
+  await page.locator('#modal input[name="description"]').fill('Groceries');
+  await page.locator('#modal input[name="amount"]').fill('1200');
+  await page.locator('#saveModal').click();
+
+  await page.getByRole('button', { name: 'Record settlement' }).click();
+  await expect(page.locator('#modalTitle')).toHaveText('Record family settlement');
+  await page.locator('#modal input[name="amount"]').fill('300');
+  await page.locator('#saveModal').click();
+
+  let rows = page.locator('#view .report-row');
+  await expect(rows.filter({ hasText: 'Asha' }).first()).toContainText('300');
+  await expect(rows.filter({ hasText: 'Ravi' }).first()).toContainText('300');
+
+  await page.locator('[data-pedit="sharedExpenses"]').click();
+  await page.locator('#modal input[name="amount"]').fill('1600');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('1,600');
+
+  await page.locator('[data-pedit="settlements"]').click();
+  await page.locator('#modal input[name="amount"]').fill('100');
+  await page.locator('#saveModal').click();
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.personal.sharedExpenses[0].amount).toBe(1600);
+  expect(stored.personal.settlements[0].amount).toBe(100);
+  expect(stored.personal.members).toHaveLength(2);
+});
