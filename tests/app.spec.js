@@ -432,6 +432,7 @@ test('business ledger duplicate detection warns and deleted entries can be resto
   await page.locator('#saveModal').click();
   let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
   expect(stored.businesses[0].data.entries).toHaveLength(2);
+  await page.locator('[data-ledger-party]').first().click();
 
   page.once('dialog', dialog => dialog.accept());
   await page.locator('[data-delete-entry]').last().click();
