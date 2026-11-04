@@ -1,0 +1,35 @@
+name: JavaScript syntax and browser tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Extract and parse every inline JavaScript block
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>", html, re.I)
+          if not scripts:
+              raise SystemExit("No inline JavaScript found")
+          for number, script in enumerate(filter(str.strip, scripts)):
+              Path(f"/tmp/digital-khata-{number}.js").write_text(script, encoding="utf-8")
+              print(f"Checking inline script {number}: {len(script)} characters")
+          PY
+          for file in /tmp/digital-khata-*.js; do node --check "$file"; done
+      - name: Run browser regression tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run test:e2e
