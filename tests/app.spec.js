@@ -169,7 +169,7 @@ test('multi-item invoice records partial payments and exposes a local UPI QR', a
   expect(business.invoices[0].paidAmount).toBe(50);
   expect(business.invoices[0].status).toBe('partial');
   await page.getByRole('button', { name: 'UPI QR' }).click();
-  await expect(page.locator('#paymentQr canvas, #paymentQr img')).toBeVisible();
+  await expect(page.locator('#paymentQr canvas, #paymentQr img').first()).toBeVisible();
 });
 
 test('personal finances, budgets, household bills and records stay separate from business books', async ({ page, isMobile }) => {
@@ -185,7 +185,7 @@ test('personal finances, budgets, household bills and records stay separate from
   await expect(page.locator('#view')).toContainText('35,000');
 
   await page.getByRole('button', { name: 'Budgets & savings' }).click();
-  await page.getByRole('button', { name: 'Budget' }).click();
+  await page.locator('[data-action="personal-budget"]').click();
   await page.locator('#modal input[name="amount"]').fill('5000');
   await page.locator('#saveModal').click();
   await expect(page.locator('#view')).toContainText('Monthly budgets');
@@ -195,7 +195,7 @@ test('personal finances, budgets, household bills and records stay separate from
   await page.locator('#modal input[name="name"]').fill('Family Member');
   await page.locator('#saveModal').click();
   await expect(page.locator('#view')).toContainText('Family Member');
-  await page.getByRole('button', { name: 'Add household bill' }).click();
+  await page.getByRole('button', { name: 'Add bill' }).click();
   await page.locator('#modal input[name="name"]').fill('Electricity');
   await page.locator('#modal input[name="amount"]').fill('1800');
   await page.locator('#saveModal').click();
@@ -437,6 +437,8 @@ test('business ledger duplicate detection warns and deleted entries can be resto
 
   page.once('dialog', dialog => dialog.accept());
   await page.locator('[data-delete-entry]').last().click();
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="upgrades"]').click();
   await expect(page.locator('#view')).toContainText('Upgrade Centre');
   await page.locator('[data-upgrade-action="tab"][data-tab="backup"]').click();
   await expect(page.locator('#view')).toContainText('business-entry');
