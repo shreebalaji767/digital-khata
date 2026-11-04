@@ -356,8 +356,8 @@ test('family expense and settlement editors calculate member balances correctly'
   await page.locator('#saveModal').click();
 
   let rows = page.locator('#view .report-row');
-  await expect(rows.filter({ hasText: 'Asha' }).first()).toContainText('300');
-  await expect(rows.filter({ hasText: 'Ravi' }).first()).toContainText('300');
+  await expect(rows.filter({ hasText: 'Asha' }).first()).toContainText('₹300.00');
+  await expect(rows.filter({ hasText: 'Ravi' }).first()).toContainText('₹-300.00');
 
   await page.locator('[data-pedit="sharedExpenses"]').click();
   await page.locator('#modal input[name="amount"]').fill('1600');
