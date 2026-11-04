@@ -424,6 +424,7 @@ test('business ledger duplicate detection warns and deleted entries can be resto
   await page.locator('#ledgerAdd').click();
   await page.locator('#modal input[name="amount"]').fill('725');
   await page.locator('#saveModal').click();
+  await page.locator('[data-ledger-party]').first().click();
 
   page.once('dialog', dialog => dialog.accept());
   await page.locator('#ledgerAdd').click();
