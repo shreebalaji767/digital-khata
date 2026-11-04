@@ -226,3 +226,98 @@ test('personal finances, budgets, household bills and records stay separate from
   expect(stored.personal.documents).toHaveLength(1);
   expect(stored.businesses[0].data.customers).toHaveLength(0);
 });
+
+
+test('family centre supports shared expenses, settlements, shopping and member chores', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="personal"]').click();
+  await page.getByRole('button', { name: 'Household', exact: true }).click();
+
+  for (const name of ['Asha', 'Ravi']) {
+    await page.getByRole('button', { name: 'Add member' }).click();
+    await page.locator('#modal input[name="name"]').fill(name);
+    await page.locator('#saveModal').click();
+  }
+
+  await page.getByRole('button', { name: 'Add shared expense' }).click();
+  await page.locator('#modal input[name="description"]').fill('Monthly groceries');
+  await page.locator('#modal input[name="amount"]').fill('1200');
+  await page.locator('#modal input[name="participants"]').check();
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Monthly groceries');
+
+  await page.getByRole('button', { name: 'Record settlement' }).click();
+  await page.locator('#modal input[name="amount"]').fill('300');
+  await page.locator('#saveModal').click();
+
+  await page.getByRole('button', { name: 'Add item' }).click();
+  await page.locator('#modal input[name="name"]').fill('Rice');
+  await page.locator('#modal input[name="quantity"]').fill('5 kg');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Rice');
+
+  await page.getByRole('button', { name: 'Tasks & reminders' }).click();
+  await page.getByRole('button', { name: 'Add task' }).click();
+  await page.locator('#modal input[name="name"]').fill('Clean kitchen');
+  await page.locator('#modal select[name="memberId"]').selectOption({ label: 'Asha' });
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Asha');
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.personal.sharedExpenses).toHaveLength(1);
+  expect(stored.personal.settlements).toHaveLength(1);
+  expect(stored.personal.shoppingItems).toHaveLength(1);
+  expect(stored.personal.tasks[0].memberId).toBe(stored.personal.members[0].id);
+});
+
+test('recurring bills, loan EMI and vehicle records work', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="personal"]').click();
+  await page.getByRole('button', { name: 'Household', exact: true }).click();
+  await page.getByRole('button', { name: 'Add household bill' }).click();
+  await page.locator('#modal input[name="name"]').fill('Electricity');
+  await page.locator('#modal input[name="amount"]').fill('1500');
+  await page.locator('#saveModal').click();
+  await page.getByRole('button', { name: 'Mark paid' }).click();
+  let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.personal.bills).toHaveLength(2);
+  expect(stored.personal.bills[0].status).toBe('Paid');
+
+  await page.getByRole('button', { name: 'Life & assets' }).click();
+  await page.getByRole('button', { name: 'Add loan' }).click();
+  await page.locator('#modal input[name="name"]').fill('Personal loan');
+  await page.locator('#modal input[name="principal"]').fill('50000');
+  await page.locator('#modal input[name="outstanding"]').fill('50000');
+  await page.locator('#modal input[name="emi"]').fill('5000');
+  await page.locator('#saveModal').click();
+  await page.getByRole('button', { name: 'Record EMI' }).click();
+  await page.locator('#modal input[name="amount"]').fill('5000');
+  await page.locator('#modal input[name="principalPaid"]').fill('4000');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('46,000');
+
+  await page.getByRole('button', { name: 'Add vehicle' }).click();
+  await page.locator('#modal input[name="name"]').fill('Family car');
+  await page.locator('#modal input[name="odometer"]').fill('25000');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Family car');
+
+  stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.personal.loans).toHaveLength(1);
+  expect(stored.personal.loans[0].outstanding).toBe(46000);
+  expect(stored.personal.vehicles).toHaveLength(1);
+  expect(stored.personal.transactions).toHaveLength(1);
+});
+
+test('personal record deletion can be restored from the recycle bin', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="personal"]').click();
+  await page.getByRole('button', { name: 'Documents' }).click();
+  await page.getByRole('button', { name: 'Add record' }).click();
+  await page.locator('#modal input[name="name"]').fill('Insurance policy');
+  await page.locator('#saveModal').click();
+  await page.getByRole('button', { name: 'Delete', exact: false }).last().click();
+  await expect(page.locator('#view')).toContainText('Recently deleted');
+  await page.getByRole('button', { name: 'Restore' }).click();
+  await expect(page.locator('#view')).toContainText('Insurance policy');
+});
