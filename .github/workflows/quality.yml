@@ -20,7 +20,7 @@ jobs:
           from pathlib import Path
           import re
           html = Path("index.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>", html, re.I)
+          scripts = re.findall(r"<script(?:\s[^>]*)?>([\s\S]*?)</script>", html, re.I)
           if not scripts:
               raise SystemExit("No inline JavaScript found")
           for number, script in enumerate(filter(str.strip, scripts)):
