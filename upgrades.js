@@ -116,7 +116,7 @@ case'create-snapshot':createSnapshot('Manual backup');break;
 case'restore-snapshot':previewRestore(id);break;
 case'check-snapshots':verifySnapshots();break;
 case'export-vault-files':exportVaultFiles();break;
-case'download-backup':A.download('digital-khata-backup-'+today()+'.json',JSON.stringify(A.getState(),null,2),'application/json');toast('Backup downloaded');break;
+case'download-backup':{const obj=A.getState(),raw=JSON.stringify(obj),pack={format:'digital-khata-backup',formatVersion:1,exportedAt:new Date().toISOString(),checksum:checksum(raw),data:obj};A.download('digital-khata-backup-'+today()+'.json',JSON.stringify(pack,null,2),'application/json');toast('Checksummed backup downloaded');break}
 case'import-backup':A.go('settings');document.querySelector('[data-action="import"]')?.click();break;
 case'export-report':exportReport();break;
 case'print-report':window.print();break;
