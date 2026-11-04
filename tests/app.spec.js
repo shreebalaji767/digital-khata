@@ -373,3 +373,72 @@ test('family expense and settlement editors calculate member balances correctly'
   expect(stored.personal.settlements[0].amount).toBe(100);
   expect(stored.personal.members).toHaveLength(2);
 });
+
+
+test('upgrade centre supports family budgets, savings, calendar, chores and document vault', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="upgrades"]').click();
+  await expect(page.locator('#view')).toContainText('Upgrade Centre');
+
+  await page.locator('[data-upgrade-action="tab"][data-tab="family"]').click();
+  await page.locator('[data-upgrade-action="add-budget"]').click();
+  await page.locator('#modal input[name="amount"]').fill('6000');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Shared budgets');
+
+  await page.locator('[data-upgrade-action="add-goal"]').click();
+  await page.locator('#modal input[name="name"]').fill('Family emergency fund');
+  await page.locator('#modal input[name="target"]').fill('50000');
+  await page.locator('#saveModal').click();
+
+  await page.locator('[data-upgrade-action="tab"][data-tab="calendar"]').click();
+  await page.locator('[data-upgrade-action="add-calendar"]').click();
+  await page.locator('#modal input[name="title"]').fill('Family meeting');
+  await page.locator('#saveModal').click();
+  await page.locator('[data-upgrade-action="add-chore"]').click();
+  await page.locator('#modal input[name="title"]').fill('Clean living room');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Clean living room');
+
+  await page.locator('[data-upgrade-action="tab"][data-tab="vault"]').click();
+  await page.locator('[data-upgrade-action="add-vault"]').click();
+  await page.locator('#modal input[name="name"]').fill('Home insurance policy');
+  await page.locator('#saveModal').click();
+  await expect(page.locator('#view')).toContainText('Home insurance policy');
+
+  await page.locator('[data-upgrade-action="tab"][data-tab="backup"]').click();
+  await expect(page.locator('#view')).toContainText('Latest automatic backup');
+  const backup = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.autobackup.v1')));
+  expect(backup.data).toContain('Family emergency fund');
+  expect(backup.data).toContain('Family meeting');
+  expect(backup.data).toContain('Home insurance policy');
+});
+
+test('business ledger duplicate detection warns and deleted entries can be restored', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="customers"]').click();
+  await page.getByRole('button', { name: 'Add customer' }).click();
+  await page.locator('#modal input[name="name"]').fill('Duplicate Check Customer');
+  await page.locator('#saveModal').click();
+  await page.getByRole('button', { name: 'Ledger', exact: true }).click();
+  await page.locator('#ledgerAdd').click();
+  await page.locator('#modal input[name="amount"]').fill('725');
+  await page.locator('#saveModal').click();
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#ledgerAdd').click();
+  await page.locator('#modal input[name="amount"]').fill('725');
+  await page.locator('#saveModal').click();
+  let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.businesses[0].data.entries).toHaveLength(2);
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('[data-delete-entry]').last().click();
+  await expect(page.locator('#view')).toContainText('Upgrade Centre');
+  await page.locator('[data-upgrade-action="tab"][data-tab="backup"]').click();
+  await expect(page.locator('#view')).toContainText('business-entry');
+  await page.locator('[data-upgrade-action="restore-trash"]').click();
+  stored = await page.evaluate(() => JSON.parse(localStorage.getItem('digitalKhata.v1')));
+  expect(stored.businesses[0].data.entries).toHaveLength(2);
+  expect(stored.upgrades.trash).toHaveLength(0);
+});
