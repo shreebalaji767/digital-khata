@@ -242,7 +242,7 @@ test('family centre supports shared expenses, settlements, shopping and member c
   await page.getByRole('button', { name: 'Add shared expense' }).click();
   await page.locator('#modal input[name="description"]').fill('Monthly groceries');
   await page.locator('#modal input[name="amount"]').fill('1200');
-  await page.locator('#modal input[name="participants"]').check();
+  await page.locator('#modal input[name="participants"]').first().check();
   await page.locator('#saveModal').click();
   await expect(page.locator('#view')).toContainText('Monthly groceries');
 
@@ -316,6 +316,7 @@ test('personal record deletion can be restored from the recycle bin', async ({ p
   await page.getByRole('button', { name: 'Add record' }).click();
   await page.locator('#modal input[name="name"]').fill('Insurance policy');
   await page.locator('#saveModal').click();
+  page.on('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Delete', exact: false }).last().click();
   await expect(page.locator('#view')).toContainText('Recently deleted');
   await page.getByRole('button', { name: 'Restore' }).click();
