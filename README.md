@@ -20,12 +20,14 @@ Static, offline-first business and personal finance management app for GitHub Pa
 - Light/dark theme, English/Hindi navigation labels and keyboard shortcuts
 - Responsive layout, visible keyboard focus and installable PWA
 
-- Separate Personal & Family workspace with income, expenses, lending, borrowing and repayments
-- Personal cash/bank/UPI accounts and account balance tracking
-- Monthly category budgets, savings goals and spending analytics
-- Household bill register with due dates, frequencies and paid/due status
-- Personal task planner and document/insurance/warranty/vehicle reference register
-- Separate personal-data export; personal records are included in full backups
+- Separate Personal & Family workspace with income, expenses, lending, borrowing, repayments and account transfers
+- Personal cash/bank/UPI accounts, account balances and monthly category budgets
+- Savings goals, household bills, spending analytics and a personal task planner
+- Asset register for property, vehicles, investments and valuables, including estimated value and associated loans
+- Subscription register with billing cycle, renewal date and active/paused/cancelled status
+- Appointment and important-date planner, plus document/insurance/warranty/vehicle reference register
+- Separate personal-data export; all personal records are included in full JSON backups
+- Distinct personal/family and business books; personal transactions do not alter business ledgers
 
 ## Keyboard shortcuts
 - Ctrl/Cmd + K: focus the current section's search field
