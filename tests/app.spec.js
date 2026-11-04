@@ -447,3 +447,15 @@ test('business ledger duplicate detection warns and deleted entries can be resto
   expect(stored.businesses[0].data.entries).toHaveLength(2);
   expect(stored.upgrades.trash).toHaveLength(0);
 });
+
+test('backup centre creates rotating snapshots and validates recovery integrity', async ({ page, isMobile }) => {
+  if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.locator('[data-page="upgrades"]').click();
+  await page.getByRole('button', { name: 'Backup & recovery' }).click();
+  await expect(page.locator('#view')).toContainText('Rotating snapshots');
+  await page.getByRole('button', { name: 'Create backup now' }).click();
+  await expect(page.locator('#view')).toContainText('Preview / restore');
+  await page.getByRole('button', { name: 'Check backup integrity' }).click();
+  await expect(page.locator('#toast')).toContainText('valid snapshot');
+  await expect(page.locator('#view')).toContainText('Recovery activity');
+});
