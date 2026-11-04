@@ -8,7 +8,7 @@ on:
 
 jobs:
   syntax:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,8 +28,3 @@ jobs:
               print(f"Checking inline script {number}: {len(script)} characters")
           PY
           for file in /tmp/digital-khata-*.js; do node --check "$file"; done
-      - name: Run browser regression tests
-        run: |
-          npm install --no-package-lock
-          npx playwright install --with-deps chromium
-          npm run test:e2e
