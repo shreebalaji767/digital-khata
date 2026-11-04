@@ -21,7 +21,14 @@ Static, offline-first business and personal finance management app for GitHub Pa
 - Responsive layout, visible keyboard focus and installable PWA
 
 - Separate Personal & Family workspace with income, expenses, lending, borrowing, repayments and account transfers
-- Household member profiles with relationship and notes, plus member-wise expense attribution and spending summaries
+- Household member profiles with relationship and notes, member-wise expense attribution, chores and spending summaries
+- Member-specific monthly budgets and savings goals, plus household-wide shared goals
+- Recurring household bills with one-click paid status and automatic next due occurrence
+- Recently deleted recycle bin with restore and permanent-delete actions
+- Personal loan and EMI manager with principal reduction and cash-expense posting
+- Vehicle register with odometer, insurance, PUC and service due-date references
+- Inventory expiry / best-before dates with due-soon and expired indicators
+- Duplicate personal transaction warnings, personal CSV export and printable PDF reports
 - Family shared-expense splitting with equal shares, payer tracking, member balances and settlement records
 - Household shopping list with quantities, estimated costs, assigned family members and bought/needed status
 - Family settlement ledger is separate from the personal cashbook to avoid double-counting shared costs
