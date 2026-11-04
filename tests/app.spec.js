@@ -32,7 +32,8 @@ test('all workspace sections open', async ({ page, isMobile }) => {
     ['Reminders', 'Reminder list'],
     ['Reports', 'Profit & loss'],
     ['Settings & Backup', 'Business profile'],
-    ['Personal & Family', 'Personal & family workspace']
+    ['Personal & Family', 'Personal & family workspace'],
+    ['Upgrade Centre', 'Upgrade Centre']
   ];
 
   for (const [navName, expectedText] of sections) {
